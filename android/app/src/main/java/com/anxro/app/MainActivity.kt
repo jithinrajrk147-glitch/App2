@@ -1,9 +1,6 @@
 package com.anxro.app
 
-import android.annotation.SuppressLint
 import android.os.Bundle
-import android.webkit.PermissionRequest
-import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
@@ -12,74 +9,70 @@ import java.util.zip.ZipInputStream
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var webView: WebView
-
-    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
 
-        webView = WebView(this)
+        val webView = WebView(this)
 
         setContentView(webView)
 
-        val wwwDir = File(filesDir, "www")
+        try {
 
-        if (!wwwDir.exists()) {
-            unzipAssets()
-        }
+            val wwwDir = File(filesDir, "www")
 
-        webView.settings.javaScriptEnabled = true
-        webView.settings.domStorageEnabled = true
-        webView.settings.allowFileAccess = true
-        webView.settings.allowContentAccess = true
-        webView.settings.mediaPlaybackRequiresUserGesture = false
+            if (!wwwDir.exists()) {
 
-        webView.webViewClient = WebViewClient()
+                val inputStream = assets.open("www.zip")
 
-        webView.webChromeClient = object : WebChromeClient() {
-            override fun onPermissionRequest(request: PermissionRequest?) {
-                request?.grant(request.resources)
-            }
-        }
+                val zipInput = ZipInputStream(inputStream)
 
-        val path =
-            "file://${filesDir.absolutePath}/www/index.html"
+                var entry = zipInput.nextEntry
 
-        webView.loadUrl(path)
+                while (entry != null) {
 
-        UpdateManager(this, webView).checkUpdate()
-    }
+                    val file = File(filesDir, "www/${entry.name}")
 
-    private fun unzipAssets() {
+                    if (entry.isDirectory) {
 
-        val inputStream = assets.open("www.zip")
+                        file.mkdirs()
 
-        val zipInput = ZipInputStream(inputStream)
+                    } else {
 
-        var entry = zipInput.nextEntry
+                        file.parentFile?.mkdirs()
 
-        while (entry != null) {
+                        file.outputStream().use {
+                            zipInput.copyTo(it)
+                        }
+                    }
 
-            val file = File(filesDir, "www/${entry.name}")
+                    zipInput.closeEntry()
 
-            if (entry.isDirectory) {
-
-                file.mkdirs()
-
-            } else {
-
-                file.parentFile?.mkdirs()
-
-                file.outputStream().use {
-                    zipInput.copyTo(it)
+                    entry = zipInput.nextEntry
                 }
+
+                zipInput.close()
             }
 
-            zipInput.closeEntry()
+            webView.settings.javaScriptEnabled = true
+            webView.settings.domStorageEnabled = true
+            webView.settings.allowFileAccess = true
 
-            entry = zipInput.nextEntry
+            webView.webViewClient = WebViewClient()
+
+            webView.loadUrl(
+                "file://${filesDir.absolutePath}/www/index.html"
+            )
+
+        } catch (e: Exception) {
+
+            e.printStackTrace()
+
+            webView.loadData(
+                "<h1>Crash</h1><pre>${e.message}</pre>",
+                "text/html",
+                "utf-8"
+            )
         }
-
-        zipInput.close()
     }
 }
