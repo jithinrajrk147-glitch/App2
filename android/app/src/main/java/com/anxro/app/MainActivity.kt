@@ -1,13 +1,22 @@
 package com.anxro.app
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.webkit.ValueCallback
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import java.io.File
 import java.util.zip.ZipInputStream
 
 class MainActivity : Activity() {
+
+    private var filePathCallback:
+            ValueCallback<Array<Uri>>? = null
+
+    private val FILE_CHOOSER_REQUEST = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -57,8 +66,41 @@ class MainActivity : Activity() {
             webView.settings.javaScriptEnabled = true
             webView.settings.domStorageEnabled = true
             webView.settings.allowFileAccess = true
+            webView.settings.allowContentAccess = true
 
             webView.webViewClient = WebViewClient()
+
+            webView.webChromeClient =
+                object : WebChromeClient() {
+
+                    override fun onShowFileChooser(
+                        webView: WebView?,
+                        filePathCallback:
+                        ValueCallback<Array<Uri>>?,
+                        fileChooserParams:
+                        FileChooserParams?
+                    ): Boolean {
+
+                        this@MainActivity.filePathCallback =
+                            filePathCallback
+
+                        val intent = Intent(
+                            Intent.ACTION_GET_CONTENT
+                        )
+
+                        intent.type = "*/*"
+
+                        startActivityForResult(
+                            Intent.createChooser(
+                                intent,
+                                "Select File"
+                            ),
+                            FILE_CHOOSER_REQUEST
+                        )
+
+                        return true
+                    }
+                }
 
             webView.loadUrl(
                 "file://${filesDir.absolutePath}/www/index.html"
@@ -71,6 +113,41 @@ class MainActivity : Activity() {
                 "text/html",
                 "utf-8"
             )
+        }
+    }
+
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
+
+        super.onActivityResult(
+            requestCode,
+            resultCode,
+            data
+        )
+
+        if (requestCode == FILE_CHOOSER_REQUEST) {
+
+            if (resultCode == Activity.RESULT_OK) {
+
+                val result =
+                    data?.data
+
+                if (result != null) {
+
+                    filePathCallback?.onReceiveValue(
+                        arrayOf(result)
+                    )
+                }
+
+            } else {
+
+                filePathCallback?.onReceiveValue(null)
+            }
+
+            filePathCallback = null
         }
     }
 }
