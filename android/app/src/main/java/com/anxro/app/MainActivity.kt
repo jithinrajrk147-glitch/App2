@@ -1,13 +1,13 @@
 package com.anxro.app
 
+import android.app.Activity
 import android.os.Bundle
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.appcompat.app.AppCompatActivity
 import java.io.File
 import java.util.zip.ZipInputStream
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -66,10 +66,8 @@ class MainActivity : AppCompatActivity() {
 
         } catch (e: Exception) {
 
-            e.printStackTrace()
-
             webView.loadData(
-                "<h1>Crash</h1><pre>${e.message}</pre>",
+                "<h1>ERROR</h1><pre>${e}</pre>",
                 "text/html",
                 "utf-8"
             )
