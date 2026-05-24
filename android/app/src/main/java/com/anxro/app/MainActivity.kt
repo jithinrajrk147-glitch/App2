@@ -10,6 +10,10 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import java.io.File
 import java.util.zip.ZipInputStream
+webView.loadUrl(
+    "file://${filesDir.absolutePath}/www/index.html"
+)
+UpdateManager(this, webView).checkUpdate()
 
 class MainActivity : Activity() {
 
