@@ -6,14 +6,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import java.io.File
 import java.util.zip.ZipInputStream
-webView.loadUrl(
-    "file://${filesDir.absolutePath}/www/index.html"
-)
-UpdateManager(this, webView).checkUpdate()
 
 class MainActivity : Activity() {
 
@@ -68,9 +65,25 @@ class MainActivity : Activity() {
             }
 
             webView.settings.javaScriptEnabled = true
+
             webView.settings.domStorageEnabled = true
+
+            webView.settings.databaseEnabled = true
+
             webView.settings.allowFileAccess = true
+
             webView.settings.allowContentAccess = true
+
+            webView.settings.allowFileAccessFromFileURLs = true
+
+            webView.settings.allowUniversalAccessFromFileURLs = true
+
+            webView.settings.loadsImagesAutomatically = true
+
+            webView.settings.mediaPlaybackRequiresUserGesture = false
+
+            webView.settings.mixedContentMode =
+                WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
 
             webView.webViewClient = WebViewClient()
 
@@ -110,9 +123,15 @@ class MainActivity : Activity() {
                 "file://${filesDir.absolutePath}/www/index.html"
             )
 
+            UpdateManager(this, webView).checkUpdate()
+
         } catch (e: Exception) {
 
-            webView.loadData(
+            val errorWebView = WebView(this)
+
+            setContentView(errorWebView)
+
+            errorWebView.loadData(
                 "<h1>ERROR</h1><pre>${e}</pre>",
                 "text/html",
                 "utf-8"
