@@ -48,7 +48,11 @@ class UpdateManager(
                     prefs.edit()
                         .putInt("version", newVersion)
                         .apply()
-
+                    NotificationHelper(context)
+    .showNotification(
+        "Anxro Updated",
+        "New version installed"
+    )
                     webView.post {
                         webView.reload()
                     }
