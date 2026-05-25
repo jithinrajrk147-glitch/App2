@@ -126,9 +126,13 @@ class MainActivity : Activity() {
                     }
                 }
 
-            webView.loadUrl(
-                "file://${filesDir.absolutePath}/www/index.html"
-            )
+            val page =
+    intent.getStringExtra("page")
+        ?: "index.html"
+
+webView.loadUrl(
+    "file://${filesDir.absolutePath}/www/$page"
+)
 
             UpdateManager(this, webView).checkUpdate()
 
