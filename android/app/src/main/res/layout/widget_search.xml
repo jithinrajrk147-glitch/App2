@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:padding="10dp">
+
+    <!-- SEARCH BAR -->
+
+    <LinearLayout
+        android:id="@+id/search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/widget_bg"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
+
+        <!-- LEFT ICON -->
+
+        <ImageView
+            android:id="@+id/open_earth"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/earth_icon"/>
+
+        <!-- SEARCH TEXT -->
+
+        <TextView
+            android:id="@+id/open_browser"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Search with Anxro..."
+            android:textColor="#1A1A1A"
+            android:textSize="16sp"
+            android:paddingLeft="15dp"/>
+
+        <!-- RIGHT ICON -->
+
+        <ImageView
+            android:id="@+id/open_search"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/search_icon"/>
+
+    </LinearLayout>
+
+</RelativeLayout>
