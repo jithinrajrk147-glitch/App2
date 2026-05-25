@@ -2,13 +2,11 @@ package com.anxro.app
 
 import android.content.Context
 import android.webkit.WebView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.io.File
 import java.net.URL
 import java.util.zip.ZipInputStream
+import kotlin.concurrent.thread
 
 class UpdateManager(
     private val context: Context,
@@ -20,96 +18,149 @@ class UpdateManager(
 
     fun checkUpdate() {
 
-        CoroutineScope(Dispatchers.IO).launch {
+        thread {
 
             try {
 
-                val jsonText = URL(versionUrl).readText()
+                val jsonText =
+                    URL(versionUrl)
+                        .readText()
 
-                val json = JSONObject(jsonText)
+                val json =
+                    JSONObject(jsonText)
 
-                val newVersion = json.getInt("version")
+                val newVersion =
+                    json.getInt("version")
 
-                val zipUrl = json.getString("zip_url")
+                val zipUrl =
+                    json.getString("zip_url")
 
                 val prefs =
                     context.getSharedPreferences(
-                        "app",
+                        "anxro_update",
                         Context.MODE_PRIVATE
                     )
 
                 val currentVersion =
-                    prefs.getInt("version", 1)
+                    prefs.getInt("version", 0)
 
                 if (newVersion > currentVersion) {
 
-                    downloadAndReplace(zipUrl)
+                    val zipFile =
+                        File(
+                            context.cacheDir,
+                            "update.zip"
+                        )
+
+                    URL(zipUrl).openStream().use { input ->
+
+                        zipFile.outputStream().use {
+                            input.copyTo(it)
+                        }
+                    }
+
+                    val wwwDir =
+                        File(
+                            context.filesDir,
+                            "www"
+                        )
+
+                    if (wwwDir.exists()) {
+
+                        wwwDir.deleteRecursively()
+                    }
+
+                    wwwDir.mkdirs()
+
+                    val zipInput =
+                        ZipInputStream(
+                            zipFile.inputStream()
+                        )
+
+                    var entry =
+                        zipInput.nextEntry
+
+                    while (entry != null) {
+
+                        var fileName =
+                            entry.name
+
+                        if (fileName.contains("/")) {
+
+                            val split =
+                                fileName.split("/")
+
+                            if (split.size > 1) {
+
+                                fileName =
+                                    split.drop(1)
+                                        .joinToString("/")
+                            }
+                        }
+
+                        if (fileName.isNotEmpty()) {
+
+                            val outFile =
+                                File(
+                                    wwwDir,
+                                    fileName
+                                )
+
+                            if (entry.isDirectory) {
+
+                                outFile.mkdirs()
+
+                            } else {
+
+                                outFile.parentFile?.mkdirs()
+
+                                outFile.outputStream().use {
+                                    zipInput.copyTo(it)
+                                }
+                            }
+                        }
+
+                        zipInput.closeEntry()
+
+                        entry =
+                            zipInput.nextEntry
+                    }
+
+                    zipInput.close()
 
                     prefs.edit()
-                        .putInt("version", newVersion)
+                        .putInt(
+                            "version",
+                            newVersion
+                        )
                         .apply()
+
                     NotificationHelper(context)
-    .showNotification(
-        "Anxro Updated",
-        "New version installed"
-    )
+                        .showNotification(
+                            "Anxro Updated",
+                            "New version installed"
+                        )
+
                     webView.post {
-                        webView.reload()
+
+                        webView.clearCache(true)
+
+                        webView.loadUrl(
+                            "file://${context.filesDir.absolutePath}/www/index.html?update=${System.currentTimeMillis()}"
+                        )
                     }
                 }
 
             } catch (e: Exception) {
+
                 e.printStackTrace()
+
+                NotificationHelper(context)
+                    .showNotification(
+                        "Update Failed",
+                        e.toString()
+                    )
             }
         }
-    }
-
-    private fun downloadAndReplace(zipUrl: String) {
-
-        val tempZip =
-            File(context.filesDir, "update.zip")
-
-        URL(zipUrl).openStream().use { input ->
-
-            tempZip.outputStream().use {
-                input.copyTo(it)
-            }
-        }
-
-        val wwwDir =
-            File(context.filesDir, "www")
-
-        wwwDir.deleteRecursively()
-
-        wwwDir.mkdirs()
-
-        val zipInput =
-            ZipInputStream(tempZip.inputStream())
-
-        var entry = zipInput.nextEntry
-
-        while (entry != null) {
-
-            val file = File(wwwDir, entry.name)
-
-            if (entry.isDirectory) {
-
-                file.mkdirs()
-
-            } else {
-
-                file.parentFile?.mkdirs()
-
-                file.outputStream().use {
-                    zipInput.copyTo(it)
-                }
-            }
-
-            zipInput.closeEntry()
-
-            entry = zipInput.nextEntry
-        }
-
-        zipInput.close()
     }
 }
