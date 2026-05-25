@@ -9,6 +9,25 @@ class NotificationHelper(
     private val context: Context
 ) {
 
+    private val channelId = "anxro"
+
+    init {
+
+        val manager =
+            context.getSystemService(
+                Context.NOTIFICATION_SERVICE
+            ) as NotificationManager
+
+        val channel =
+            NotificationChannel(
+                channelId,
+                "Anxro Notifications",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+
+        manager.createNotificationChannel(channel)
+    }
+
     fun showNotification(
         title: String,
         text: String
@@ -19,23 +38,17 @@ class NotificationHelper(
                 Context.NOTIFICATION_SERVICE
             ) as NotificationManager
 
-        val channel =
-            NotificationChannel(
-                "anxro",
-                "Anxro",
-                NotificationManager.IMPORTANCE_HIGH
-            )
-
-        manager.createNotificationChannel(channel)
-
         val notification =
             NotificationCompat.Builder(
                 context,
-                "anxro"
+                channelId
             )
+                .setSmallIcon(
+                    android.R.drawable.ic_dialog_info
+                )
                 .setContentTitle(title)
                 .setContentText(text)
-                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setAutoCancel(true)
                 .build()
 
         manager.notify(
