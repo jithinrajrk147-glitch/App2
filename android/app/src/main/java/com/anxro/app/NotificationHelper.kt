@@ -59,33 +59,33 @@ class NotificationHelper(
             )
 
         val notification =
-            NotificationCompat.Builder(
-                context,
-                channelId
-            )
+    NotificationCompat.Builder(
+        context,
+        channelId
+    )
 
-                .setSmallIcon(
-                    R.drawable.ic_notification
-                )
+        .setSmallIcon(
+            R.mipmap.ic_launcher
+        )
 
-                .setContentTitle(title)
+        .setContentTitle(title)
 
-                .setContentText(text)
+        .setContentText(text)
 
-                .setStyle(
-                    NotificationCompat.BigTextStyle()
-                        .bigText(text)
-                )
+        .setStyle(
+            NotificationCompat.BigTextStyle()
+                .bigText(text)
+        )
 
-                .setPriority(
-                    NotificationCompat.PRIORITY_HIGH
-                )
+        .setPriority(
+            NotificationCompat.PRIORITY_HIGH
+        )
 
-                .setAutoCancel(true)
+        .setAutoCancel(true)
 
-                .setContentIntent(pendingIntent)
+        .setContentIntent(pendingIntent)
 
-                .build()
+        .build()
 
         manager.notify(
             System.currentTimeMillis().toInt(),
