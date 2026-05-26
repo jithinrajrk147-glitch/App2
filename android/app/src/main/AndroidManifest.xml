@@ -19,8 +19,9 @@
         android:name="android.permission.RECORD_AUDIO"/>
 
     <application
-    android:label="Anxro"    android:icon="@drawable/ic_launcher_foreground"
-android:roundIcon="@drawable/ic_launcher_foreground"
+    android:label="Anxro"     
+android:icon="@drawable/app_logo"
+android:roundIcon="@drawable/app_logo"
 android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
 
         <!-- MAIN ACTIVITY -->
