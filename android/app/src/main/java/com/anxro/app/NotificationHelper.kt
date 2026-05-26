@@ -30,37 +30,62 @@ class NotificationHelper(
         channel.description =
             "Anxro App Notifications"
 
-        manager.createNotificationChannel(channel)
+        manager.createNotificationChannel(
+            channel
+        )
     }
 
     fun showNotification(
-    title: String,
-    text: String
-) {
+        title: String,
+        text: String
+    ) {
 
-    val manager =
-        context.getSystemService(
-            Context.NOTIFICATION_SERVICE
-        ) as NotificationManager
+        val intent =
+            Intent(
+                context,
+                MainActivity::class.java
+            )
 
-    val notification =
-        NotificationCompat.Builder(
-            context,
-            channelId
+        intent.flags =
+            Intent.FLAG_ACTIVITY_NEW_TASK or
+            Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+        val pendingIntent =
+            PendingIntent.getActivity(
+                context,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or
+                PendingIntent.FLAG_IMMUTABLE
+            )
+
+        val manager =
+            context.getSystemService(
+                Context.NOTIFICATION_SERVICE
+            ) as NotificationManager
+
+        val notification =
+            NotificationCompat.Builder(
+                context,
+                channelId
+            )
+                .setSmallIcon(
+                    R.mipmap.ic_launcher
+                )
+                .setContentTitle(title)
+                .setContentText(text)
+                .setPriority(
+                    NotificationCompat.PRIORITY_HIGH
+                )
+                .setContentIntent(
+                    pendingIntent
+                )
+                .setAutoCancel(true)
+                .build()
+
+        manager.notify(
+            System.currentTimeMillis().toInt(),
+            notification
         )
-            .setSmallIcon(
-                R.mipmap.ic_launcher
-            )
-            .setContentTitle(title)
-            .setContentText(text)
-            .setPriority(
-                NotificationCompat.PRIORITY_HIGH
-            )
-            .setAutoCancel(true)
-            .build()
-
-    manager.notify(
-        System.currentTimeMillis().toInt(),
-        notification
-    )
+    }
 }
