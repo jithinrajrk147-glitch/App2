@@ -75,7 +75,14 @@ val rightLogo =
     loadingView.findViewById<
         android.widget.ImageView
     >(R.id.rightLogo)
-        setContentView(webView)
+        val frame =
+    android.widget.FrameLayout(this)
+
+frame.addView(webView)
+
+frame.addView(loadingView)
+
+setContentView(frame)
 
         try {
 
@@ -135,7 +142,44 @@ val rightLogo =
             webView.settings.mixedContentMode =
                 WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
 
-            webView.webViewClient = WebViewClient()
+            webView.webViewClient =
+    object : WebViewClient() {
+
+        override fun onPageStarted(
+            view: WebView?,
+            url: String?,
+            favicon: android.graphics.Bitmap?
+        ) {
+
+            loadingView.visibility =
+                android.view.View.VISIBLE
+        }
+
+        override fun onPageFinished(
+            view: WebView?,
+            url: String?
+        ) {
+
+            leftLogo.animate()
+                .translationX(45f)
+                .setDuration(900)
+                .start()
+
+            rightLogo.animate()
+                .translationX(-45f)
+                .setDuration(900)
+                .start()
+
+            android.os.Handler(
+                mainLooper
+            ).postDelayed({
+
+                loadingView.visibility =
+                    android.view.View.GONE
+
+            }, 1000)
+        }
+    }
 
             webView.webChromeClient =
                 object : WebChromeClient() {
