@@ -1,14 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- INTERNET -->
+
+    <uses-permission
+        android:name="android.permission.INTERNET"/>
+
+    <!-- NOTIFICATION -->
+
+    <uses-permission
+        android:name="android.permission.POST_NOTIFICATIONS"/>
+
+    <!-- MICROPHONE -->
+
+    <uses-permission
+        android:name="android.permission.RECORD_AUDIO"/>
 
     <application
-        <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-<uses-permission android:name="android.permission.RECORD_AUDIO"/>
         android:label="Anxro"
         android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
+
+        <!-- MAIN ACTIVITY -->
 
         <activity
             android:name=".MainActivity"
@@ -16,13 +30,17 @@
 
             <intent-filter>
 
-                <action android:name="android.intent.action.MAIN"/>
+                <action
+                    android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category
+                    android:name="android.intent.category.LAUNCHER"/>
 
             </intent-filter>
 
         </activity>
+
+        <!-- WIDGET -->
 
         <receiver
             android:name=".SearchWidgetProvider"
