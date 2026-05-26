@@ -4,11 +4,14 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.FrameLayout
+import android.widget.ImageView
 import java.io.File
 import java.util.zip.ZipInputStream
 
@@ -21,121 +24,95 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-    super.onCreate(savedInstanceState)
+        super.onCreate(savedInstanceState)
 
-    requestPermissions(
-        arrayOf(
-            android.Manifest.permission.RECORD_AUDIO,
-            android.Manifest.permission.POST_NOTIFICATIONS,
-            android.Manifest.permission.READ_EXTERNAL_STORAGE
-        ),
-        1
-    )
-
-    val webView = WebView(this)
-
-    val loadingView =
-        layoutInflater.inflate(
-            R.layout.loading_view,
-            null
+        requestPermissions(
+            arrayOf(
+                android.Manifest.permission.RECORD_AUDIO,
+                android.Manifest.permission.POST_NOTIFICATIONS,
+                android.Manifest.permission.READ_EXTERNAL_STORAGE
+            ),
+            1
         )
 
-    val leftLogo =
-        loadingView.findViewById<
-            android.widget.ImageView
-        >(R.id.leftLogo)
+        val webView = WebView(this)
 
-    val rightLogo =
-        loadingView.findViewById<
-            android.widget.ImageView
-        >(R.id.rightLogo)
+        val loadingView =
+            layoutInflater.inflate(
+                R.layout.loading_view,
+                null
+            )
 
-    fun animateLoader() {
+        val leftLogo =
+            loadingView.findViewById<ImageView>(
+                R.id.leftLogo
+            )
 
-        val animator =
-            android.animation.ValueAnimator
-                .ofFloat(25f, 36f)
+        val rightLogo =
+            loadingView.findViewById<ImageView>(
+                R.id.rightLogo
+            )
 
-        animator.duration = 800
+        fun animateLoader() {
 
-        animator.repeatCount =
-            android.animation.ValueAnimator.INFINITE
+            val animator =
+                android.animation.ValueAnimator
+                    .ofFloat(25f, 36f)
 
-        animator.repeatMode =
-            android.animation.ValueAnimator.REVERSE
+            animator.duration = 800
 
-        animator.addUpdateListener {
+            animator.repeatCount =
+                android.animation.ValueAnimator.INFINITE
 
-            val value =
-                it.animatedValue as Float
+            animator.repeatMode =
+                android.animation.ValueAnimator.REVERSE
 
-            leftLogo.translationX = value
+            animator.addUpdateListener {
 
-            rightLogo.translationX = -value
+                val value =
+                    it.animatedValue as Float
+
+                leftLogo.translationX = value
+
+                rightLogo.translationX = -value
+            }
+
+            animator.start()
         }
 
-        animator.start()
-    }
+        animateLoader()
 
-    animateLoader()
+        val frame = FrameLayout(this)
 
-    val frame =
-        android.widget.FrameLayout(this)
+        frame.addView(webView)
 
-    frame.addView(webView)
+        frame.addView(loadingView)
 
-    frame.addView(loadingView)
-
-    setContentView(frame)
-        super.onCreate(savedInstanceState)
-     requestPermissions(
-        arrayOf(
-          android.Manifest.permission.RECORD_AUDIO,
-          android.Manifest.permission.POST_NOTIFICATIONS,
-          android.Manifest.permission.READ_EXTERNAL_STORAGE
-         ),
-        1
-       )
-        val webView = WebView(this)
-        val loadingView =
-    layoutInflater.inflate(
-        R.layout.loading_view,
-        null
-    )
-
-val leftLogo =
-    loadingView.findViewById<
-        android.widget.ImageView
-    >(R.id.leftLogo)
-
-val rightLogo =
-    loadingView.findViewById<
-        android.widget.ImageView
-    >(R.id.rightLogo)
-        val frame =
-    android.widget.FrameLayout(this)
-
-frame.addView(webView)
-
-frame.addView(loadingView)
-
-setContentView(frame)
+        setContentView(frame)
 
         try {
 
-            val wwwDir = File(filesDir, "www")
+            val wwwDir =
+                File(filesDir, "www")
 
             if (!wwwDir.exists()) {
 
-                val inputStream = assets.open("www.zip")
+                val inputStream =
+                    assets.open("www.zip")
 
-                val zipInput = ZipInputStream(inputStream)
+                val zipInput =
+                    ZipInputStream(inputStream)
 
-                var entry = zipInput.nextEntry
+                var entry =
+                    zipInput.nextEntry
 
                 while (entry != null) {
 
-                    val file = File(filesDir, "www/${entry.name}")
+                    val file =
+                        File(
+                            filesDir,
+                            "www/${entry.name}"
+                        )
 
                     if (entry.isDirectory) {
 
@@ -152,7 +129,8 @@ setContentView(frame)
 
                     zipInput.closeEntry()
 
-                    entry = zipInput.nextEntry
+                    entry =
+                        zipInput.nextEntry
                 }
 
                 zipInput.close()
@@ -180,43 +158,42 @@ setContentView(frame)
                 WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
 
             webView.webViewClient =
-    object : WebViewClient() {
+                object : WebViewClient() {
 
-        override fun onPageStarted(
-            view: WebView?,
-            url: String?,
-            favicon: android.graphics.Bitmap?
-        ) {
+                    override fun onPageStarted(
+                        view: WebView?,
+                        url: String?,
+                        favicon: android.graphics.Bitmap?
+                    ) {
 
-            loadingView.visibility =
-                android.view.View.VISIBLE
-        }
+                        loadingView.visibility =
+                            android.view.View.VISIBLE
+                    }
 
-        override fun onPageFinished(
-            view: WebView?,
-            url: String?
-        ) {
+                    override fun onPageFinished(
+                        view: WebView?,
+                        url: String?
+                    ) {
 
-            leftLogo.animate()
-                .translationX(45f)
-                .setDuration(900)
-                .start()
+                        leftLogo.animate()
+                            .translationX(45f)
+                            .setDuration(900)
+                            .start()
 
-            rightLogo.animate()
-                .translationX(-45f)
-                .setDuration(900)
-                .start()
+                        rightLogo.animate()
+                            .translationX(-45f)
+                            .setDuration(900)
+                            .start()
 
-            android.os.Handler(
-                mainLooper
-            ).postDelayed({
+                        Handler(mainLooper)
+                            .postDelayed({
 
-                loadingView.visibility =
-                    android.view.View.GONE
+                                loadingView.visibility =
+                                    android.view.View.GONE
 
-            }, 1000)
-        }
-    }
+                            }, 1000)
+                    }
+                }
 
             webView.webChromeClient =
                 object : WebChromeClient() {
@@ -232,9 +209,10 @@ setContentView(frame)
                         this@MainActivity.filePathCallback =
                             filePathCallback
 
-                        val intent = Intent(
-                            Intent.ACTION_GET_CONTENT
-                        )
+                        val intent =
+                            Intent(
+                                Intent.ACTION_GET_CONTENT
+                            )
 
                         intent.type = "*/*"
 
@@ -251,18 +229,22 @@ setContentView(frame)
                 }
 
             val page =
-    intent.getStringExtra("page")
-        ?: "index.html"
+                intent.getStringExtra("page")
+                    ?: "index.html"
 
-webView.loadUrl(
-    "file://${filesDir.absolutePath}/www/$page"
-)
+            webView.loadUrl(
+                "file://${filesDir.absolutePath}/www/$page"
+            )
 
-            UpdateManager(this, webView).checkUpdate()
+            UpdateManager(
+                this,
+                webView
+            ).checkUpdate()
 
         } catch (e: Exception) {
 
-            val errorWebView = WebView(this)
+            val errorWebView =
+                WebView(this)
 
             setContentView(errorWebView)
 
