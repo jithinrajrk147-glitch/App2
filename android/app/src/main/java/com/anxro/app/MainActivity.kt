@@ -4,15 +4,16 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.FrameLayout
-import android.widget.ImageView
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import java.io.File
+import java.util.concurrent.TimeUnit
 import java.util.zip.ZipInputStream
 
 class MainActivity : Activity() {
@@ -37,60 +38,26 @@ class MainActivity : Activity() {
 
         val webView = WebView(this)
 
-        val loadingView =
-            layoutInflater.inflate(
-                R.layout.loading_view,
-                null
-            )
-
-        val leftLogo =
-            loadingView.findViewById<ImageView>(
-                R.id.leftLogo
-            )
-
-        val rightLogo =
-            loadingView.findViewById<ImageView>(
-                R.id.rightLogo
-            )
-
-        fun animateLoader() {
-
-            val animator =
-                android.animation.ValueAnimator
-                    .ofFloat(25f, 36f)
-
-            animator.duration = 800
-
-            animator.repeatCount =
-                android.animation.ValueAnimator.INFINITE
-
-            animator.repeatMode =
-                android.animation.ValueAnimator.REVERSE
-
-            animator.addUpdateListener {
-
-                val value =
-                    it.animatedValue as Float
-
-                leftLogo.translationX = value
-
-                rightLogo.translationX = -value
-            }
-
-            animator.start()
-        }
-
-        animateLoader()
-
-        val frame = FrameLayout(this)
-
-        frame.addView(webView)
-
-        frame.addView(loadingView)
-
-        setContentView(frame)
+        setContentView(webView)
 
         try {
+
+            val notifyWork =
+
+                PeriodicWorkRequestBuilder<
+                    NotificationWorker
+                >(
+                    15,
+                    TimeUnit.MINUTES
+                ).build()
+
+            WorkManager
+                .getInstance(this)
+                .enqueueUniquePeriodicWork(
+                    "anxro_notify",
+                    ExistingPeriodicWorkPolicy.KEEP,
+                    notifyWork
+                )
 
             val wwwDir =
                 File(filesDir, "www")
@@ -158,42 +125,7 @@ class MainActivity : Activity() {
                 WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
 
             webView.webViewClient =
-                object : WebViewClient() {
-
-                    override fun onPageStarted(
-                        view: WebView?,
-                        url: String?,
-                        favicon: android.graphics.Bitmap?
-                    ) {
-
-                        loadingView.visibility =
-                            android.view.View.VISIBLE
-                    }
-
-                    override fun onPageFinished(
-                        view: WebView?,
-                        url: String?
-                    ) {
-
-                        leftLogo.animate()
-                            .translationX(45f)
-                            .setDuration(900)
-                            .start()
-
-                        rightLogo.animate()
-                            .translationX(-45f)
-                            .setDuration(900)
-                            .start()
-
-                        Handler(mainLooper)
-                            .postDelayed({
-
-                                loadingView.visibility =
-                                    android.view.View.GONE
-
-                            }, 1000)
-                    }
-                }
+                object : WebViewClient() {}
 
             webView.webChromeClient =
                 object : WebChromeClient() {
