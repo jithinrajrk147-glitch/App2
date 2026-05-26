@@ -20,7 +20,36 @@ class MainActivity : Activity() {
     private val FILE_CHOOSER_REQUEST = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
+    fun animateLoader() {
 
+    val animator =
+        android.animation.ValueAnimator
+            .ofFloat(25f, 36f)
+
+    animator.duration = 800
+
+    animator.repeatCount =
+        android.animation.ValueAnimator.INFINITE
+
+    animator.repeatMode =
+        android.animation.ValueAnimator.REVERSE
+
+    animator.addUpdateListener {
+
+        val value =
+            it.animatedValue as Float
+
+        leftLogo.translationX =
+            value
+
+        rightLogo.translationX =
+            -value
+    }
+
+    animator.start()
+}
+
+animateLoader()
         super.onCreate(savedInstanceState)
      requestPermissions(
         arrayOf(
@@ -31,7 +60,21 @@ class MainActivity : Activity() {
         1
        )
         val webView = WebView(this)
+        val loadingView =
+    layoutInflater.inflate(
+        R.layout.loading_view,
+        null
+    )
 
+val leftLogo =
+    loadingView.findViewById<
+        android.widget.ImageView
+    >(R.id.leftLogo)
+
+val rightLogo =
+    loadingView.findViewById<
+        android.widget.ImageView
+    >(R.id.rightLogo)
         setContentView(webView)
 
         try {
