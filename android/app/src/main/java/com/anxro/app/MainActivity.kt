@@ -20,36 +20,73 @@ class MainActivity : Activity() {
     private val FILE_CHOOSER_REQUEST = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+    super.onCreate(savedInstanceState)
+
+    requestPermissions(
+        arrayOf(
+            android.Manifest.permission.RECORD_AUDIO,
+            android.Manifest.permission.POST_NOTIFICATIONS,
+            android.Manifest.permission.READ_EXTERNAL_STORAGE
+        ),
+        1
+    )
+
+    val webView = WebView(this)
+
+    val loadingView =
+        layoutInflater.inflate(
+            R.layout.loading_view,
+            null
+        )
+
+    val leftLogo =
+        loadingView.findViewById<
+            android.widget.ImageView
+        >(R.id.leftLogo)
+
+    val rightLogo =
+        loadingView.findViewById<
+            android.widget.ImageView
+        >(R.id.rightLogo)
+
     fun animateLoader() {
 
-    val animator =
-        android.animation.ValueAnimator
-            .ofFloat(25f, 36f)
+        val animator =
+            android.animation.ValueAnimator
+                .ofFloat(25f, 36f)
 
-    animator.duration = 800
+        animator.duration = 800
 
-    animator.repeatCount =
-        android.animation.ValueAnimator.INFINITE
+        animator.repeatCount =
+            android.animation.ValueAnimator.INFINITE
 
-    animator.repeatMode =
-        android.animation.ValueAnimator.REVERSE
+        animator.repeatMode =
+            android.animation.ValueAnimator.REVERSE
 
-    animator.addUpdateListener {
+        animator.addUpdateListener {
 
-        val value =
-            it.animatedValue as Float
+            val value =
+                it.animatedValue as Float
 
-        leftLogo.translationX =
-            value
+            leftLogo.translationX = value
 
-        rightLogo.translationX =
-            -value
+            rightLogo.translationX = -value
+        }
+
+        animator.start()
     }
 
-    animator.start()
-}
+    animateLoader()
 
-animateLoader()
+    val frame =
+        android.widget.FrameLayout(this)
+
+    frame.addView(webView)
+
+    frame.addView(loadingView)
+
+    setContentView(frame)
         super.onCreate(savedInstanceState)
      requestPermissions(
         arrayOf(
