@@ -70,7 +70,7 @@ class NotificationHelper(
                 channelId
             )
                 .setSmallIcon(
-                    R.mipmap.ic_launcher
+                    R.drawable.notify_icon
                 )
                 .setContentTitle(title)
                 .setContentText(text)
