@@ -128,37 +128,49 @@ class MainActivity : Activity() {
                 object : WebViewClient() {}
 
             webView.webChromeClient =
-                object : WebChromeClient() {
+    object : WebChromeClient() {
 
-                    override fun onShowFileChooser(
-                        webView: WebView?,
-                        filePathCallback:
-                        ValueCallback<Array<Uri>>?,
-                        fileChooserParams:
-                        FileChooserParams?
-                    ): Boolean {
+        override fun onPermissionRequest(
+            request: android.webkit.PermissionRequest?
+        ) {
 
-                        this@MainActivity.filePathCallback =
-                            filePathCallback
+            runOnUiThread {
 
-                        val intent =
-                            Intent(
-                                Intent.ACTION_GET_CONTENT
-                            )
+                request?.grant(
+                    request.resources
+                )
+            }
+        }
 
-                        intent.type = "*/*"
+        override fun onShowFileChooser(
+            webView: WebView?,
+            filePathCallback:
+            ValueCallback<Array<Uri>>?,
+            fileChooserParams:
+            FileChooserParams?
+        ): Boolean {
 
-                        startActivityForResult(
-                            Intent.createChooser(
-                                intent,
-                                "Select File"
-                            ),
-                            FILE_CHOOSER_REQUEST
-                        )
+            this@MainActivity.filePathCallback =
+                filePathCallback
 
-                        return true
-                    }
-                }
+            val intent =
+                Intent(
+                    Intent.ACTION_GET_CONTENT
+                )
+
+            intent.type = "*/*"
+
+            startActivityForResult(
+                Intent.createChooser(
+                    intent,
+                    "Select File"
+                ),
+                FILE_CHOOSER_REQUEST
+            )
+
+            return true
+        }
+    }
 
             val page =
                 intent.getStringExtra("page")
