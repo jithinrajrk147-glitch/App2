@@ -18,7 +18,7 @@ class NotificationWorker(
 
             val jsonText =
                 URL(
-                    "https://github.com/jithinrajrk147-glitch/Sliser-/blob/main/notifications.json"
+                    "https://jithinrajrk147-glitch.github.io/Sliser-/notifications.json"
                 ).readText()
 
             val json =
